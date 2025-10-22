@@ -1,79 +1,96 @@
 ﻿using System.Diagnostics;
 
-namespace ImageGenerator
-{
-    public partial class MainPage : ContentPage
-    {
-        static private bool _isFavorite;
+namespace ImageGenerator {
+	public class Picture {
+		public required string name { get; set; }
+		public required string description { get; set; }
+		public bool favorite { get; set; }
+	}
+	public partial class MainPage : ContentPage {
+		private static List<Picture> ImageList = new List<Picture>() {
+			new Picture() {
+				name = "image1",
+				description = "Man",
+				favorite = false
+			},
+			new Picture() {
+				name = "image2",
+				description = "Bird",
+				favorite = false
+			},
+			new Picture() {
+				name = "image3",
+				description = "Big cat",
+				favorite = false
+			},
+			new Picture() {
+				name = "image4",
+				description = "Autumn road",
+				favorite = false
+			},
+			new Picture() {
+				name = "image5",
+				description = "Flowergirl",
+				favorite = false
+			},
+		};
+		private Random random = new();
+		private Picture p;
+		public MainPage()
+		{
+			InitializeComponent();
+		}
+		private void ImageOnClicked(object? sender, EventArgs e)
+		{
+			ShowImageAndText();
+		}
+		private void setfavorite()
+		{
+			if (p.favorite) {
+				FavoriteButton.Source = new FontImageSource {
+					Glyph = "\ue87d",
+					FontFamily = "MaterialIcons",
+					Size = 32,
+					Color = Colors.Red
+				};
+			} else {
+				FavoriteButton.Source = new FontImageSource {
+					Glyph = "\ue87e",
+					FontFamily = "MaterialIcons",
+					Size = 32,
+					Color = Colors.Gray
+				};
+			}
+		}
+		private void ShowImageAndText()
+		{
+			string showKey;
 
-        private Dictionary<string, string> ImageList = new()
-            {
-                {"image1", "Man" },
-                {"image2", "Bird" },
-                {"image3", "Big cat" },
-                {"image4", "Autumn road" },
-                {"image5", "Flowergirl" }
-            };
+			p = ImageList[random.Next(ImageList.Count)];
 
+			showKey = GetImageFileEnding(p.name);
 
-        private Random random = new();
+			ShowGallery.Source = showKey;
 
-        public MainPage()
-        {
-            InitializeComponent();
-        }
+			ImageText.Text = p.description;
+			setfavorite();
+		}
 
-        private void ImageOnClicked(object? sender, EventArgs e)
-        {
-            ShowImageAndText();
-        }
+		private static string GetImageFileEnding(string imageKey)
+		{
+#if WINDOWS
+			return imageKey + ".jpg";
+#else
+			return imageKey;
+#endif
+		}
 
-        private void ShowImageAndText()
-        {
-            var pairs = ImageList.ElementAt(random.Next(ImageList.Count));
-
-            Debug.WriteLine(pairs.Key + ": " + pairs.Value); // för testning i Output
-
-            string showKey = GetImageFileEnding(pairs.Key); // detta då Windows, men inte till exempel Android, kräver filändelse
-
-            ShowGallery.Source = showKey;
-
-            ImageText.Text = pairs.Value;
-        }
-
-        private string GetImageFileEnding(string imageKey)
-        {
-            #if WINDOWS
-            return imageKey + ".jpg";
-            #else
-            return imageKey;
-            #endif
-        }
-
-        private void OnFavoriteClicked(object sender, EventArgs e)
-        {
-            _isFavorite = !_isFavorite;
-
-            if (_isFavorite)
-            {
-                FavoriteButton.Source = new FontImageSource
-                {
-                    Glyph = "\ue87d",
-                    FontFamily = "MaterialIcons",
-                    Size = 32,
-                    Color = Colors.Red
-                };
-            }
-            else
-            {
-                FavoriteButton.Source = new FontImageSource
-                {
-                    Glyph = "\ue87e",
-                    FontFamily = "MaterialIcons",
-                    Size = 32,
-                    Color = Colors.Gray
-                };
-            }
-        }
-    }
+		private void OnFavoriteClicked(object sender, EventArgs e)
+		{
+			if(p != null) {
+				p.favorite = !p.favorite;
+				setfavorite();
+			}
+		}
+	}
 }
